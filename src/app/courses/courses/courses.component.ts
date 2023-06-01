@@ -11,7 +11,8 @@ import { CoursesService } from '../services/courses.service';
 })
 export class CoursesComponent {
 
-  courses: Observable<Course[]>;
+  //$ indica que é um Observable
+  courses$: Observable<Course[]>;
 
   displayedColumns = ['name', 'category'];
 
@@ -19,6 +20,6 @@ export class CoursesComponent {
   constructor(private coursesService: CoursesService) {
     //this.courses = [];
 
-    this.courses = this.coursesService.list();
+    this.courses$ = this.coursesService.list();
   }
 }
