@@ -5,6 +5,7 @@ import { Course } from '../model/course';
 import { CoursesService } from '../services/courses.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorDialogComponent } from 'src/app/shared/components/error-dialog/error-dialog.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-courses',
@@ -16,12 +17,14 @@ export class CoursesComponent {
   //$ indica que é um Observable
   courses$: Observable<Course[]>;
 
-  displayedColumns = ['name', 'category'];
+  displayedColumns = ['name', 'category', 'actions'];
 
   //A variável pode ser inicializada no construtor
   constructor(
     private coursesService: CoursesService,
-    private dialog: MatDialog) {
+    private dialog: MatDialog,
+    private router: Router,
+    private activedRoute: ActivatedRoute) {
     //this.courses = [];
 
     this.courses$ = this.coursesService.list()
@@ -37,5 +40,9 @@ export class CoursesComponent {
     this.dialog.open(ErrorDialogComponent, {
       data: errorMsg
     });
+  }
+
+  onAdd() {
+    this.router.navigate(['new'], {relativeTo: this.activedRoute});
   }
 }

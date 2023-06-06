@@ -1,0 +1,23 @@
+mat-card {
+  margin: 2em auto;
+  margin-top: 10px;
+  width: 80%;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.min-width {
+  width: 100%;
+  min-width: 150px;
+}
+
+mat-card-actions{
+  justify-content: center;
+}
+
+.saveButton {
+  margin: 0 20px;
+}
