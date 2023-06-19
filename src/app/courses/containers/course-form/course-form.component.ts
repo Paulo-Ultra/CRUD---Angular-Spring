@@ -2,8 +2,10 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
 
 import { CoursesService } from '../../services/courses.service';
+import { Course } from '../../model/course';
 
 @Component({
   selector: 'app-course-form',
@@ -14,6 +16,7 @@ export class CourseFormComponent implements OnInit {
 
 form = this.formBuilder.group({
   // Sem uso do NonNullableFormBuilder name: new FormControl<string>('', {nonNullable: true}),
+  _id: [''],
   name: [''],
   //Há essas duas formas de declarar o formControl
   category: [''],
@@ -23,11 +26,18 @@ form = this.formBuilder.group({
     private formBuilder: NonNullableFormBuilder,
     private service: CoursesService,
     private snackBar: MatSnackBar,
-    private location: Location) {
+    private location: Location,
+    private activatedRoute: ActivatedRoute) {
 
   }
 
   ngOnInit(): void {
+    const course: Course = this.activatedRoute.snapshot.data['course'];
+    this.form.setValue({
+      _id: course._id,
+      name: course.name,
+      category: course.category,
+    })
   }
 
   onSubmit() {
