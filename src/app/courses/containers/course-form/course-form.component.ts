@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { NonNullableFormBuilder } from '@angular/forms';
+import { NonNullableFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 
@@ -17,9 +17,12 @@ export class CourseFormComponent implements OnInit {
 form = this.formBuilder.group({
   // Sem uso do NonNullableFormBuilder name: new FormControl<string>('', {nonNullable: true}),
   _id: [''],
-  name: [''],
-  //Há essas duas formas de declarar o formControl
-  category: [''],
+  name: [
+    '',
+    [Validators.required,
+    Validators.minLength(5),
+    Validators.maxLength(100)]],
+  category: ['', Validators.required],
 });;
 
   constructor(
@@ -49,6 +52,26 @@ form = this.formBuilder.group({
 
   onCancel() {
     this.location.back();
+  }
+
+  getErrorMessage(fieldName: string) {
+    const field = this.form.get(fieldName);
+    // A interrogação faz a verificação se o campo não é nulo
+    if(field?.hasError('required')) {
+      return 'Campo obrigatório';
+    }
+
+    if(field?.hasError('minlength')) {
+      const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 5;
+      return `Tamanho mínimo precisa ser de ${requiredLength} caracteres`;
+    }
+
+    if(field?.hasError('maxlength')) {
+      const requiredLength = field.errors ? field.errors['maxlength']['requiredLength'] : 100;
+      return `Tamanho máximo excedido de ${requiredLength} caracteres`;
+    }
+
+    return 'Campo Inválido';
   }
 
   private onSucess() {
