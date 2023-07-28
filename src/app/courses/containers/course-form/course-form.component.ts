@@ -47,7 +47,7 @@ export class CourseFormComponent implements OnInit {
         Validators.minLength(5),
         Validators.maxLength(100)]],
       category: [course.category, [Validators.required]],
-      lessons: this.formBuilder.array(this.retrieveLessons(course))
+      lessons: this.formBuilder.array(this.retrieveLessons(course), Validators.required)
     });
     console.log(this.form);
     console.log(this.form.value);
@@ -60,34 +60,30 @@ export class CourseFormComponent implements OnInit {
     console.log(course);*/
   }
 
-  private retrieveLessons(course: Course) {
-    const lessons = [];
-    if(course?.lessons) {
-      course.lessons.forEach(lesson =>
-        lessons.push(this.createLesson(lesson)));
-    } else {
-      lessons.push(this.createLesson());
-    }
-    return lessons;
-  }
-
-  private createLesson(lesson: Lesson = {id: '', name: '', youtubeUrl: ''}) {
-    return this.formBuilder.group({
-      id: [lesson.id],
-      name: [lesson.name],
-      youtubeUrl: [lesson.youtubeUrl]
-    });
-  }
-
   getLessonsFormArray() {
     return (<UntypedFormArray>this.form.get('lessons')).controls;
   }
 
+  addNewLesson() {
+    //Trabalhar com Array se usa o UntypedFormArray
+    const lessons = this.form.get('lessons') as UntypedFormArray;
+    lessons.push(this.createLesson());
+  }
+
+  removeLesson(index: number) {
+    const lessons = this.form.get('lessons') as UntypedFormArray;
+    lessons.removeAt(index);
+  }
+
   onSubmit() {
-    this.service.save(this.form.value)
+    if(this.form.valid) {
+      this.service.save(this.form.value)
     .subscribe(result => this.onSucess(), error =>{
       this.onError();
     });
+    } else {
+      alert('Form inválido');
+    }
   }
 
   onCancel() {
@@ -114,6 +110,11 @@ export class CourseFormComponent implements OnInit {
     return 'Campo Inválido';
   }
 
+  isFormArrayRequired() {
+    const lessons = this.form.get('lessons') as UntypedFormArray;
+    return !lessons.valid && lessons.hasError('required') && lessons.touched;
+  }
+
   private onSucess() {
     this.snackBar.open('Curso salvo com sucesso', '', {
       duration: 5000,
@@ -124,6 +125,29 @@ export class CourseFormComponent implements OnInit {
   private onError() {
     this.snackBar.open('Erro ao salvar curso', '', {
       duration: 5000,
+    });
+  }
+
+  private retrieveLessons(course: Course) {
+    const lessons = [];
+    if(course?.lessons) {
+      course.lessons.forEach(lesson =>
+        lessons.push(this.createLesson(lesson)));
+    } else {
+      lessons.push(this.createLesson());
+    }
+    return lessons;
+  }
+
+  private createLesson(lesson: Lesson = {id: '', name: '', youtubeUrl: ''}) {
+    return this.formBuilder.group({
+      id: [lesson.id],
+      name: [lesson.name, [Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(100)]],
+      youtubeUrl: [lesson.youtubeUrl, [Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(11)]]
     });
   }
 }
