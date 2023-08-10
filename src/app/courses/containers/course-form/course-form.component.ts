@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CoursesService } from '../../services/courses.service';
 import { Course } from '../../model/course';
 import { Lesson } from '../../model/lesson';
+import { FormUtilsService } from 'src/app/shared/form/form-utils.service';
 
 @Component({
   selector: 'app-course-form',
@@ -34,7 +35,8 @@ export class CourseFormComponent implements OnInit {
     private service: CoursesService,
     private snackBar: MatSnackBar,
     private location: Location,
-    private activatedRoute: ActivatedRoute) {
+    private activatedRoute: ActivatedRoute,
+    public formUtils: FormUtilsService) {
 
   }
 
@@ -49,8 +51,6 @@ export class CourseFormComponent implements OnInit {
       category: [course.category, [Validators.required]],
       lessons: this.formBuilder.array(this.retrieveLessons(course), Validators.required)
     });
-    console.log(this.form);
-    console.log(this.form.value);
 
     /*this.form.setValue({
       _id: course._id,
@@ -82,37 +82,12 @@ export class CourseFormComponent implements OnInit {
       this.onError();
     });
     } else {
-      alert('Form inválido');
+      this.formUtils.validateAllFormFields(this.form);
     }
   }
 
   onCancel() {
     this.location.back();
-  }
-
-  getErrorMessage(fieldName: string) {
-    const field = this.form.get(fieldName);
-    // A interrogação faz a verificação se o campo não é nulo
-    if(field?.hasError('required')) {
-      return 'Campo obrigatório';
-    }
-
-    if(field?.hasError('minlength')) {
-      const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 5;
-      return `Tamanho mínimo precisa ser de ${requiredLength} caracteres`;
-    }
-
-    if(field?.hasError('maxlength')) {
-      const requiredLength = field.errors ? field.errors['maxlength']['requiredLength'] : 100;
-      return `Tamanho máximo excedido de ${requiredLength} caracteres`;
-    }
-
-    return 'Campo Inválido';
-  }
-
-  isFormArrayRequired() {
-    const lessons = this.form.get('lessons') as UntypedFormArray;
-    return !lessons.valid && lessons.hasError('required') && lessons.touched;
   }
 
   private onSucess() {
